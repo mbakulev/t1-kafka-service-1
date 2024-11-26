@@ -44,3 +44,6 @@ t1:
   maxExecutionTime: 1000
   maxTransactionsPerInterval: 2
   transactionsInterval: 60 # time in seconds
+
+server:
+  port: 8081

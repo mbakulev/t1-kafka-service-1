@@ -10,6 +10,8 @@ import ru.t1.java.demo.dto.TransactionAcceptResult;
 import ru.t1.java.demo.service.AccountService;
 import ru.t1.java.demo.service.TransactionService;
 
+import java.math.BigDecimal;
+
 import static java.lang.System.out;
 
 @Slf4j
@@ -27,25 +29,29 @@ public class KafkaTransactionResultConsumer {
 
         try {
             out.println("TransactionAcceptResult: " + transactionAcceptResult);
+
             if (transactionAcceptResult.getStatus().equals("ACCEPTED")) {
                 transactionService.updateTransactionStatus(transactionAcceptResult.getTransactionId(), "ACCEPTED");
             }
             if (transactionAcceptResult.getStatus().equals("REJECTED")) {
                 transactionService.updateTransactionStatus(transactionAcceptResult.getTransactionId(), "REJECTED");
+                BigDecimal returnTransactionAmount = transactionAcceptResult.getTransactionAmount().multiply(new BigDecimal("-1"));
 
                 accountService.changeAccountBalance(
                         transactionAcceptResult.getAccountId(),
-                        transactionAcceptResult.getTransactionAmount()
+                        returnTransactionAmount
                 );
             }
             if (transactionAcceptResult.getStatus().equals("BLOCKED")) {
                 transactionService.updateTransactionStatus(transactionAcceptResult.getTransactionId(), "BLOCKED");
-                accountService.changeAccountBalance(
-                        transactionAcceptResult.getAccountId(),
-                        transactionAcceptResult.getTransactionAmount()
-                );
-
+                accountService.blockAccount(transactionAcceptResult.getAccountId());
                 accountService.setFrozenAmount(transactionAcceptResult.getAccountId(), transactionAcceptResult.getTransactionAmount());
+                // Баланс не меняем, потому что уже меняли в KafkaTransactionConsumer
+
+//                accountService.changeAccountBalance(
+//                        transactionAcceptResult.getAccountId(),
+//                        transactionAcceptResult.getTransactionAmount()
+//                );
             }
         } finally {
             ack.acknowledge();

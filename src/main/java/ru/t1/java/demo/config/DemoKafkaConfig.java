@@ -21,6 +21,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
 import ru.t1.java.demo.dto.*;
+import ru.t1.java.demo.kafka.KafkaClientProducer;
 import ru.t1.java.demo.kafka.MessageDeserializer;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 
@@ -65,20 +66,20 @@ public class DemoKafkaConfig<T> {
         return props;
     }
 
-    @Bean
-    public ConsumerFactory<String, ClientDto> consumerListenerFactory() {
-        Map<String, Object> props = getDefaultProps();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.t1.java.demo.dto.ClientDto");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MessageDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, MessageDeserializer.class.getName());
-        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, MessageDeserializer.class);
-
-        DefaultKafkaConsumerFactory<String, ClientDto> factory = new DefaultKafkaConsumerFactory<>(props);
-        factory.setKeyDeserializer(new StringDeserializer());
-
-        return factory;
-    }
+//    @Bean
+//    public ConsumerFactory<String, ClientDto> consumerListenerFactory() {
+//        Map<String, Object> props = getDefaultProps();
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.t1.java.demo.dto.ClientDto");
+//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MessageDeserializer.class);
+//        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, MessageDeserializer.class.getName());
+//        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, MessageDeserializer.class);
+//
+//        DefaultKafkaConsumerFactory<String, ClientDto> factory = new DefaultKafkaConsumerFactory<>(props);
+//        factory.setKeyDeserializer(new StringDeserializer());
+//
+//        return factory;
+//    }
 
     @Bean
     public ConsumerFactory<String, DataSourceErrorLog> dataSourceErrorLogConsumerFactory() {
@@ -91,13 +92,13 @@ public class DemoKafkaConfig<T> {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    @Bean
-    public ConsumerFactory<String, AccountDto> accountConsumerListenerFactory() {
-        Map<String, Object> props = getDefaultProps();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.t1.java.demo.dto.AccountDto");
-
-        return new DefaultKafkaConsumerFactory<>(props);
-    }
+//    @Bean
+//    public ConsumerFactory<String, AccountDto> accountConsumerListenerFactory() {
+//        Map<String, Object> props = getDefaultProps();
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.t1.java.demo.dto.AccountDto");
+//
+//        return new DefaultKafkaConsumerFactory<>(props);
+//    }
 
     @Bean
     public ConsumerFactory<String, TransactionDto> transactionConsumerListenerFactory() {
@@ -114,7 +115,7 @@ public class DemoKafkaConfig<T> {
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
-
+//
     @Bean
     public ConsumerFactory<String, TransactionAcceptResult> transactionAcceptResultConsumerListenerFactory() {
         Map<String, Object> props = getDefaultProps();
@@ -123,26 +124,26 @@ public class DemoKafkaConfig<T> {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    @Bean
-    ConcurrentKafkaListenerContainerFactory<String, ClientDto> kafkaListenerContainerFactory(@Qualifier("consumerListenerFactory") ConsumerFactory<String, ClientDto> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, ClientDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factoryBuilder(consumerFactory, factory);
-        return factory;
-    }
+//    @Bean
+//    ConcurrentKafkaListenerContainerFactory<String, ClientDto> kafkaListenerContainerFactory(@Qualifier("consumerListenerFactory") ConsumerFactory<String, ClientDto> consumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<String, ClientDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        factoryBuilder(consumerFactory, factory);
+//        return factory;
+//    }
+//
+//    @Bean
+//    ConcurrentKafkaListenerContainerFactory<String, DataSourceErrorLog> dataSourceErrorLogKafkaListenerContainerFactory(@Qualifier("dataSourceErrorLogConsumerFactory") ConsumerFactory<String, DataSourceErrorLog> consumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<String, DataSourceErrorLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        factoryBuilder(consumerFactory, factory);
+//        return factory;
+//    }
 
-    @Bean
-    ConcurrentKafkaListenerContainerFactory<String, DataSourceErrorLog> dataSourceErrorLogKafkaListenerContainerFactory(@Qualifier("dataSourceErrorLogConsumerFactory") ConsumerFactory<String, DataSourceErrorLog> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, DataSourceErrorLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factoryBuilder(consumerFactory, factory);
-        return factory;
-    }
-
-    @Bean
-    ConcurrentKafkaListenerContainerFactory<String, AccountDto> accountDtoKafkaListenerContainerFactory(@Qualifier("accountConsumerListenerFactory") ConsumerFactory<String, AccountDto> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, AccountDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factoryBuilder(consumerFactory, factory);
-        return factory;
-    }
+//    @Bean
+//    ConcurrentKafkaListenerContainerFactory<String, AccountDto> accountDtoKafkaListenerContainerFactory(@Qualifier("accountConsumerListenerFactory") ConsumerFactory<String, AccountDto> consumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<String, AccountDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        factoryBuilder(consumerFactory, factory);
+//        return factory;
+//    }
 
     @Bean
     ConcurrentKafkaListenerContainerFactory<String, TransactionDto> transactionKafkaListenerContainerFactory(@Qualifier("transactionConsumerListenerFactory") ConsumerFactory<String, TransactionDto> consumerFactory) {
@@ -190,14 +191,14 @@ public class DemoKafkaConfig<T> {
         return new KafkaTemplate<>(producerPatFactory);
     }
 
-//    @Bean
-//    @ConditionalOnProperty(value = "t1.kafka.producer.enable",
-//            havingValue = "true",
-//            matchIfMissing = true)
-//    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, ClientDto> template) {
-//        template.setDefaultTopic(clientTopic);
-//        return new KafkaClientProducer(template);
-//    }
+    @Bean
+    @ConditionalOnProperty(value = "t1.kafka.producer.enable",
+            havingValue = "true",
+            matchIfMissing = true)
+    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, ClientDto> template) {
+        template.setDefaultTopic(clientTopic);
+        return new KafkaClientProducer(template);
+    }
 
     @Bean("producerClientFactory")
     public ProducerFactory<String, T> producerClientFactory() {

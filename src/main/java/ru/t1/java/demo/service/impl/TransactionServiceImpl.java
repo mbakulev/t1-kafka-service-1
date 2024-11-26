@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
         System.out.println("transactionDto: " + transactionDto);
         // System.out.println(transactionDto);
         if (accountRepository.findById(transactionDto.getAccountId()).isPresent()) {
-            System.out.println("finded account");
+            System.out.println("found account");
             System.out.println(accountRepository.findById(transactionDto.getAccountId()));
             kafkaTemplate.send("t1_demo_transactions", UUID.randomUUID().toString(), transactionDto);
             kafkaTemplate.flush();
@@ -79,6 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(id).orElse(null);
         if (transaction != null) {
             transaction.setTransactionStatus(status);
+            transactionRepository.save(transaction);
         }
     }
 

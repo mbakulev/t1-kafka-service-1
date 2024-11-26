@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.t1.java.demo.dto.AccountDto;
 import ru.t1.java.demo.model.Account;
-import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.service.AccountService;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -73,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = getAccount(id);
         if (account != null) {
             BigDecimal oldBalance = account.getBalance();
-            BigDecimal newBalance = oldBalance.add(transactionAmount);
+            BigDecimal newBalance = oldBalance.subtract(transactionAmount);
             account.setBalance(newBalance);
 
             return accountRepository.save(account);
@@ -92,5 +90,17 @@ public class AccountServiceImpl implements AccountService {
 
             accountRepository.save(account);
         }
+    }
+
+    @Override
+    public Account blockAccount(Long id) {
+        Account account = getAccount(id);
+        if (account != null) {
+            System.out.println("block account: " + account);
+            account.setAccountStatus("BLOCKED");
+
+            return accountRepository.save(account);
+        }
+        return null;
     }
 }
